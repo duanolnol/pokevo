@@ -3,7 +3,7 @@ function App() {
 
   return (
     <>
-      <div className="text-xl">Test</div>
+      <div className="text-xl">Home page</div>
     </>
   );
 }
