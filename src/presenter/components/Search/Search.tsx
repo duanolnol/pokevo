@@ -1,16 +1,11 @@
 import React from "react";
+import { useSearch } from "../../hooks/useSearch";
 
-interface SearchProps {
-  search: string;
-  onSearch: (text: string) => void;
-  onClear: () => void;
-}
-
-const Search: React.FC<SearchProps> = ({ search, onSearch, onClear }) => {
-
+const Search: React.FC = () => {
+  const { search, handleSearch, handleClear } = useSearch();
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      onSearch(search);
+      handleSearch(search);
     }
   };
 
@@ -22,13 +17,13 @@ const Search: React.FC<SearchProps> = ({ search, onSearch, onClear }) => {
         value={search}
         placeholder="Search Pokemon"
         className="w-full border border-gray-400 rounded-full p-4 focus:outline-none focus:border-green-600"
-        onChange={(event) => onSearch(event.target.value)}
+        onChange={(event) => handleSearch(event.target.value)}
         onKeyDown={handleKeyDown}
       />
       {search && (
         <button
           className="absolute mt-0 mr-0 right-6 top-5"
-          onClick={onClear}
+          onClick={handleClear}
           role="button"
         >
           <img src="/close.svg" alt="close" className="w-5 h-5" />

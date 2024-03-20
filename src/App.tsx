@@ -1,4 +1,3 @@
-import React from "react";
 import Search from "./presenter/components/Search";
 import List from "./presenter/components/List";
 
@@ -17,18 +16,12 @@ const datas = [
 ];
 
 const App = () => {
-  const [search, setSearch] = React.useState("");
-
   const handleChoose = () => alert("Choose Pokemon");
-
-  const handleClear = () => setSearch("");
-
-  const handleSearch = (search: string) => setSearch(search);
 
   return (
     <main className="flex flex-col h-screen">
       <div className="flex justify-center p-5">
-        <Search search={search} onClear={handleClear} onSearch={handleSearch} />
+        <Search />
       </div>
       <div className="flex-grow overflow-auto mt-2 p-4 pb-15">
         <List datas={datas} />
