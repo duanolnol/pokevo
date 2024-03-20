@@ -33,9 +33,9 @@ const App = () => {
       <div className="flex-grow overflow-auto mt-2 p-4 pb-15">
         <List datas={datas} />
       </div>
-      <div className="bg-white w-full fixed bottom-0 h-20 flex justify-center items-center">
+      <div className="bg-white w-full fixed bottom-0 h-24 lg:h-32 flex justify-center items-center">
         <button
-          className="w-full max-w-md bg-green-900 text-white rounded-full p-3 mx-4"
+          className="w-full lg:w-1/5 bg-green-900 text-white rounded-full p-4 mx-4"
           onClick={handleChoose}
         >
           I choose you
