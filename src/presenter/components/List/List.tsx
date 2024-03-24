@@ -1,25 +1,49 @@
-import React from "react";
+import React, { LegacyRef } from "react";
 import Card from "../Card";
-
-export interface Data {
-  name: string;
-  url: string;
-  id: string;
-  imageUrl: {
-    small: string;
-    large: string;
-  };
-}
+import { ItemResult } from "@/interfaces/pokemon";
+import Skeleton from "../Skeleton";
 
 interface ListProps {
-  datas: Data[];
+  isLoading: boolean;
+  results: ItemResult[];
+  lastElementRef: LegacyRef<HTMLDivElement>;
+  handleSelect: (pokemon: ItemResult) => void;
+  selected: ItemResult | null;
 }
 
-const List: React.FC<ListProps> = ({ datas }) => (
-  <div className="grid lg:grid-cols-4 grid-cols-3 gap-4">
-    {datas.map((data) => (
-      <Card key={data.id} data={data} />
-    ))}
+const GridSkeleton = () => {
+  return (
+    <>
+      {[...Array(15).keys()].map((_, index) => {
+        return <Skeleton key={`skeleton-${index}`} />;
+      })}
+    </>
+  );
+};
+
+const List: React.FC<ListProps> = ({
+  isLoading,
+  results,
+  lastElementRef,
+  handleSelect,
+  selected,
+}) => (
+  <div className="grid grid-cols-3 gap-4">
+      {results?.map((data, index) => (
+        <div
+          key={data.id}
+          className="flex justify-center mb-8 lg:mx-8"
+          ref={results.length === index + 1 ? lastElementRef : null}
+        >
+          <Card
+            data={data}
+            onSelect={handleSelect}
+            isSelected={data.id === selected?.id}
+          />
+        </div>
+      ))}
+
+    {isLoading && <GridSkeleton />}
   </div>
 );
 

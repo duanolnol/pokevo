@@ -1,22 +1,34 @@
+import { ItemResult } from "@/interfaces/pokemon";
 import React from "react";
-import { Data } from "../List/List";
 
 interface CardProps {
-  data: Data;
+  data: ItemResult;
+  onSelect: (item: ItemResult) => void;
+  isSelected: boolean;
 }
 
-const Card: React.FC<CardProps> = ({ data }) => (
-  <button onClick={() => alert("Select Pokemon")} className="flex flex-col items-center">
+const Card: React.FC<CardProps> = ({ data, onSelect, isSelected }) => (
+  <button onClick={() => onSelect(data)} className="flex flex-col items-center">
     <div
-      className="border border-grey-100 rounded-full p-4 mb-2"
+      className={`border ${
+        isSelected
+          ? "border-yellow-500 border-4"
+          : "bg-gradient-to-r from-yellow-100 to-yellow-200"
+      } rounded-full p-0.5 mb-2`}
     >
-      <img
-        alt={`${data.name}`}
-        className="w-full h-auto"
-        src={data.imageUrl.large}
-      />
+      <div className="bg-gray-900 rounded-full p-4 lg:p-8">
+        <img
+          alt={`${data.name}`}
+          className="w-full h-auto"
+          src={data.imageUrl.large}
+        />
+      </div>
     </div>
-    <h2 className="font-sm font-medium capitalize text-ellipsis whitespace-nowrap">
+    <h2
+      className={`font-sm font-medium ${
+        isSelected ? "dark:text-yellow-500" : "dark:text-white"
+      } capitalize text-ellipsis whitespace-nowrap`}
+    >
       {data.name}
     </h2>
   </button>

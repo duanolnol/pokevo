@@ -1,22 +1,31 @@
 import React from "react";
-import { useSearch } from "../../hooks/useSearch";
 
-const Search: React.FC = () => {
-  const { search, handleSearch, handleClear } = useSearch();
+type SearchProps = {
+  search: string;
+  handleSearch: (search: string) => void;
+  handleClear: () => void;
+};
+
+const Search: React.FC<SearchProps> = ({
+  search,
+  handleSearch,
+  handleClear,
+}) => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && search) {
       handleSearch(search);
     }
   };
 
   return (
-    <div className="relative w-full md:w-2/3 lg:w-1/3">
+    <div className="relative w-full lg:w-1/2">
       <input
         role="textbox"
+        alt="Search Pokemon"
         type="text"
         value={search}
         placeholder="Search Pokemon"
-        className="w-full border border-gray-400 rounded-full p-4 focus:outline-none focus:border-green-600"
+        className="w-full border border-gray-400 shadow-[rgba(0,0,0,0.5)_2px_2px_4px_0px] rounded-full p-4 pr-12 focus:outline-none focus:border-green-600"
         onChange={(event) => handleSearch(event.target.value)}
         onKeyDown={handleKeyDown}
       />
