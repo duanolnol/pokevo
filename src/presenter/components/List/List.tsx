@@ -11,15 +11,10 @@ interface ListProps {
   selected: ItemResult | null;
 }
 
-const GridSkeleton = () => {
-  return (
-    <>
-      {[...Array(15).keys()].map((_, index) => {
-        return <Skeleton key={`skeleton-${index}`} />;
-      })}
-    </>
-  );
-};
+const skeletons = () =>
+  [...Array(10).keys()].map((_, index) => {
+    return <Skeleton key={`skeleton-${index}`} />;
+  });
 
 const List: React.FC<ListProps> = ({
   isLoading,
@@ -29,21 +24,21 @@ const List: React.FC<ListProps> = ({
   selected,
 }) => (
   <div className="grid grid-cols-3 gap-4">
-      {results?.map((data, index) => (
-        <div
-          key={data.id}
-          className="flex justify-center mb-8 lg:mx-8"
-          ref={results.length === index + 1 ? lastElementRef : null}
-        >
-          <Card
-            data={data}
-            onSelect={handleSelect}
-            isSelected={data.id === selected?.id}
-          />
-        </div>
-      ))}
+    {results?.map((data, index) => (
+      <div
+        key={data.id}
+        className="flex justify-center mb-8 lg:mx-8"
+        ref={results.length === index + 1 ? lastElementRef : null}
+      >
+        <Card
+          data={data}
+          onSelect={handleSelect}
+          isSelected={data.id === selected?.id}
+        />
+      </div>
+    ))}
 
-    {isLoading && <GridSkeleton />}
+    {isLoading && skeletons()}
   </div>
 );
 
