@@ -16,7 +16,7 @@ const Card: React.FC<CardProps> = ({ data, onSelect, isSelected }) => (
           : "bg-gradient-to-r from-yellow-100 to-yellow-200"
       } rounded-full p-0.5 mb-2`}
     >
-      <div className="bg-gray-900 rounded-full p-4 lg:p-8">
+      <div className="bg-slate-200 dark:bg-gray-900 rounded-full p-4 lg:p-8">
         <img
           alt={`${data.name}`}
           className="w-full h-auto"

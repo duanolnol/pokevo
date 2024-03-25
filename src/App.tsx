@@ -4,6 +4,7 @@ import React from "react";
 import { useSearch } from "./hooks/useSearch";
 import { usePokemon } from "./hooks/usePokemon";
 import { ItemResult } from "./interfaces/pokemon";
+import ThemeSwitcher from "./presenter/components/ThemeSwitcher";
 
 const App = () => {
   const { search, handleSearch, handleClear } = useSearch();
@@ -62,8 +63,8 @@ const App = () => {
 
   return (
     <main className="flex justify-center">
-      <div className="w-full h-screen flex flex-col items-center dark:bg-gray-900 overflow-y-scroll">
-        <div className="absolute w-full flex justify-center items-center">
+      <div className="w-full h-screen flex flex-col items-center dark:bg-gray-900 bg-slate-200 overflow-y-scroll">
+        <div className="absolute z-50 w-full flex justify-center items-center">
           <div className="flex w-full justify-center items-center space-x-4 p-4 bg-transparent">
             <img className="w-24 lg:w-32 h-auto" src="/logo.png" alt="Logo" />
             <Search
@@ -71,6 +72,7 @@ const App = () => {
               handleSearch={onHandleSearch}
               handleClear={onHandleClear}
             />
+            <ThemeSwitcher />
           </div>
         </div>
         <div className="p-4 pt-32 pb-20">
