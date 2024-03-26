@@ -2,11 +2,11 @@ version: '1'
 
 services:
   frontend:
-    container_name: pokemon-evolution-dev
+    container_name: pokevo-dev
     build:
       context: .
       dockerfile: Dockerfile.dev
-    image: "pokemon-evolution-dev:1.0.0"
+    image: "pokevo-dev:1.0.0"
     volumes:
       - '.:/app'
       - '/app/node_modules'
