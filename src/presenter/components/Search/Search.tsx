@@ -25,7 +25,7 @@ const Search: React.FC<SearchProps> = ({
         type="text"
         value={search}
         placeholder="Search Pokemon"
-        className="w-full border border-gray-400 shadow-[rgba(0,0,0,0.5)_2px_2px_4px_0px] rounded-full lg:p-4 px-4 py-3 pr-12 focus:outline-none focus:border-green-600"
+        className="w-full border border-gray-400 shadow-[rgba(0,0,0,0.5)_2px_2px_4px_0px] rounded-full lg:p-4 lg:pr-12 px-4 py-3 pr-10 focus:outline-none focus:border-green-600"
         onChange={(event) => handleSearch(event.target.value)}
         onKeyDown={handleKeyDown}
       />

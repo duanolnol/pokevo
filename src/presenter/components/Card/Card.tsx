@@ -25,7 +25,7 @@ const Card: React.FC<CardProps> = ({ data, onSelect, isSelected }) => (
       </div>
     </div>
     <h2
-      className={`text-sm lg:text-md font-medium ${
+      className={`text-lg lg:text-xl font-medium ${
         isSelected ? "dark:text-yellow-500" : "dark:text-white"
       } capitalize text-ellipsis whitespace-nowrap`}
     >

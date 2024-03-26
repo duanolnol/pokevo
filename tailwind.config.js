@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {},
+    fontFamily: {
+      sans: ['Levi-Windows']
+    }
   },
   plugins: [],
   darkMode: 'selector',
