@@ -5,6 +5,10 @@ import { useSearch } from "./hooks/useSearch";
 import { usePokemon } from "./hooks/usePokemon";
 import { ItemResult } from "./interfaces/pokemon";
 import ThemeSwitcher from "./presenter/components/ThemeSwitcher";
+import ls from "localstorage-slim";
+import { useNavigate } from "react-router";
+import Layout from "./presenter/components/Layout";
+import Button from "./presenter/components/Button";
 
 const App = () => {
   const { search, handleSearch, handleClear } = useSearch();
@@ -13,6 +17,7 @@ const App = () => {
   const limit = 10;
   const [currentData, setCurrentData] = React.useState<ItemResult[]>([]);
   const [selected, setSelected] = React.useState<ItemResult | null>(null);
+  const navigate = useNavigate();
 
   const { data, isLoading, isFetched } = usePokemon(search, limit, offset);
 
@@ -26,7 +31,19 @@ const App = () => {
     }
   }, [isFetched, data?.results, search]);
 
-  const handleChoose = () => alert("Choose Pokemon");
+  React.useEffect(() => {
+    const storedPokemon: ItemResult | null = ls.get("POKEMON_STORE", {
+      decrypt: true,
+    });
+    if (storedPokemon) {
+      navigate(`/${storedPokemon?.name}`);
+    }
+  }, [navigate, selected?.name]);
+
+  const handleChoose = () => {
+    ls.set("POKEMON_STORE", selected, { encrypt: true });
+    navigate(`/${selected?.name}`);
+  };
   const loadMore = () => setOffset((prev) => prev + limit);
   const onHandleClear = () => {
     handleClear();
@@ -62,42 +79,38 @@ const App = () => {
   );
 
   return (
-    <main className="flex justify-center">
-      <div className="w-full h-screen flex flex-col items-center dark:bg-gray-900 bg-slate-200 overflow-y-scroll">
-        <div className="absolute z-50 w-full flex justify-center items-center">
-          <div className="flex w-full justify-center items-center space-x-4 p-4 bg-transparent">
-            <img className="w-24 lg:w-32 h-auto" src="/logo.png" alt="Logo" />
-            <Search
-              search={search}
-              handleSearch={onHandleSearch}
-              handleClear={onHandleClear}
-            />
-            <ThemeSwitcher />
-          </div>
-        </div>
-        <div className="p-4 pt-32 pb-20">
-          <List
-            isLoading={isLoading}
-            lastElementRef={lastElementRef}
-            results={currentData}
-            handleSelect={handleSelect}
-            selected={selected}
+    <Layout>
+      <div className="absolute z-50 w-full flex justify-center items-center">
+        <div className="flex w-full justify-center items-center space-x-4 p-4 bg-transparent">
+          <img className="w-20 lg:w-32 h-auto" src="/logo.png" alt="Logo" />
+          <Search
+            search={search}
+            handleSearch={onHandleSearch}
+            handleClear={onHandleClear}
           />
-        </div>
-        <div className="flex justify-center items-center">
-          <div className="w-full lg:w-1/3 fixed border-0 rounded-t-xl lg:rounded-t-full bottom-0 h-20 flex justify-center items-center">
-            <button
-              className="w-full lg:w-3/5 bg-gradient-to-b from-yellow-500 to-yellow-700 disabled:bg-gradient-to-b disabled:from-gray-100 disabled:to-gray-300 disabled:text-gray-700 disabled:cursor-not-allowed disabled:text-sm font-medium text-white rounded-full p-4 mx-4 shadow-[rgba(0,0,5,0.5)_2px_2px_4px_0px]"
-              onClick={handleChoose}
-              disabled={!selected}
-              aria-label="I choose you"
-            >
-              {selected ? "I choose you" : "Select your favorite Pokemon!"}
-            </button>
-          </div>
+          <ThemeSwitcher />
         </div>
       </div>
-    </main>
+      <div className="p-4 pt-24 lg:pt-32 pb-20">
+        <List
+          isLoading={isLoading}
+          lastElementRef={lastElementRef}
+          results={currentData}
+          handleSelect={handleSelect}
+          selected={selected}
+        />
+      </div>
+      <div className="flex justify-center items-center">
+        <div className="w-full lg:w-1/3 fixed border-0 rounded-t-xl lg:rounded-t-full bottom-0 h-20 flex justify-center items-center">
+          <Button
+            title={selected ? "I choose you" : "Select your favorite Pokemon!"}
+            ariaLabel="Choose Pokemon"
+            handleClick={handleChoose}
+            isDisabled={!selected}
+          />
+        </div>
+      </div>
+    </Layout>
   );
 };
 

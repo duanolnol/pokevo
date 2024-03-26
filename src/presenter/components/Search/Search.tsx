@@ -18,20 +18,20 @@ const Search: React.FC<SearchProps> = ({
   };
 
   return (
-    <div className="relative w-full lg:w-1/2">
+    <div className="relative w-full lg:w-2/5">
       <input
         role="textbox"
         alt="Search Pokemon"
         type="text"
         value={search}
         placeholder="Search Pokemon"
-        className="w-full border border-gray-400 shadow-[rgba(0,0,0,0.5)_2px_2px_4px_0px] rounded-full p-4 pr-12 focus:outline-none focus:border-green-600"
+        className="w-full border border-gray-400 shadow-[rgba(0,0,0,0.5)_2px_2px_4px_0px] rounded-full lg:p-4 px-4 py-3 pr-12 focus:outline-none focus:border-green-600"
         onChange={(event) => handleSearch(event.target.value)}
         onKeyDown={handleKeyDown}
       />
       {search && (
         <button
-          className="absolute mt-0 mr-0 right-6 top-5"
+          className="absolute mt-0 mr-0 top-4 right-4 lg:right-6 lg:top-5"
           onClick={handleClear}
           role="button"
         >
