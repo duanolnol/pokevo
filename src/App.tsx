@@ -1,5 +1,5 @@
 import Search from "./presenter/components/Search";
-import List from "./presenter/components/List";
+import List from "./presenter/components/List/Pokemon";
 import React from "react";
 import { useSearch } from "./hooks/useSearch";
 import { usePokemon } from "./hooks/usePokemon";
@@ -80,8 +80,8 @@ const App = () => {
 
   return (
     <Layout>
-      <div className="absolute z-50 w-full flex justify-center items-center">
-        <div className="flex w-full justify-center items-center space-x-4 p-4 bg-transparent">
+      <header className="absolute z-50 w-full flex justify-center items-center">
+        <div className="flex w-full justify-center items-center space-x-4 lg:space-x-6 p-4 bg-transparent">
           <img className="w-20 lg:w-32 h-auto" src="/logo.png" alt="Logo" />
           <Search
             search={search}
@@ -90,8 +90,8 @@ const App = () => {
           />
           <ThemeSwitcher />
         </div>
-      </div>
-      <div className="p-4 pt-24 lg:pt-32 pb-20">
+      </header>
+      <section className="p-4 pt-24 lg:pt-32 pb-20">
         <List
           isLoading={isLoading}
           lastElementRef={lastElementRef}
@@ -99,17 +99,17 @@ const App = () => {
           handleSelect={handleSelect}
           selected={selected}
         />
-      </div>
-      <div className="flex justify-center items-center">
+      </section>
+      <footer className="flex justify-center items-center">
         <div className="w-full lg:w-1/3 fixed border-0 rounded-t-xl lg:rounded-t-full bottom-0 h-20 flex justify-center items-center">
           <Button
-            title={selected ? "I choose you" : "Select your favorite Pokemon!"}
+            title={selected ? "I choose you" : "Select your Pokemon ..."}
             ariaLabel="Choose Pokemon"
             handleClick={handleChoose}
             isDisabled={!selected}
           />
         </div>
-      </div>
+      </footer>
     </Layout>
   );
 };

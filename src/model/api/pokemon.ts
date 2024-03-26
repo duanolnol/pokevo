@@ -43,7 +43,6 @@ export const getPokemon = async (
         const { data } = await axios.get(
           `${import.meta.env.VITE_API_URL}/pokemon/${id}`
         );
-
         return {
           ...pokemon,
           id: id,

@@ -1,7 +1,7 @@
 import React, { LegacyRef } from "react";
-import Card from "../Card";
+import Card from "../../Card";
 import { ItemResult } from "@/interfaces/pokemon";
-import Skeleton from "../Skeleton";
+import Skeleton from "../../Skeleton/Pokemon";
 
 interface ListProps {
   isLoading: boolean;
@@ -16,7 +16,7 @@ const skeletons = () =>
     return <Skeleton key={`skeleton-${index}`} />;
   });
 
-const List: React.FC<ListProps> = ({
+const ListPokemon: React.FC<ListProps> = ({
   isLoading,
   results,
   lastElementRef,
@@ -42,4 +42,4 @@ const List: React.FC<ListProps> = ({
   </div>
 );
 
-export default List;
+export default ListPokemon;

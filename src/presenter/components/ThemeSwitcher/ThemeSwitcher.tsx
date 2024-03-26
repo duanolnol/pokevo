@@ -1,6 +1,6 @@
 import React from "react";
 import ls from "localstorage-slim";
-import { DarkModeSwitch } from 'react-toggle-dark-mode';
+import { DarkModeSwitch } from "react-toggle-dark-mode";
 
 const ThemeSwitcher = () => {
   const [darkMode, setDarkMode] = React.useState(false);
@@ -34,11 +34,9 @@ const ThemeSwitcher = () => {
   };
 
   return (
-    <DarkModeSwitch
-      checked={darkMode}
-      onChange={toggleTheme}
-      size={40}
-    />
+    <div>
+      <DarkModeSwitch checked={darkMode} onChange={toggleTheme} size={35} />
+    </div>
   );
 };
 
