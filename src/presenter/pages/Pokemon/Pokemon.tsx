@@ -104,7 +104,7 @@ const Pokemon: React.FC = () => {
 
   return (
     <Layout>
-      <header className="absolute z-50 w-full flex justify-center items-center px-8">
+      <header className="absolute z-50 w-full flex justify-center items-center px-3 lg:px-8">
         <img className="w-20 lg:w-32 h-auto" src="/logo.png" alt="Logo" />
         <div className="flex w-full justify-center items-center space-x-6 p-4 bg-transparent">
           <div className="text-black dark:text-white font-bold text-2xl lg:text-3xl capitalize">
@@ -113,17 +113,17 @@ const Pokemon: React.FC = () => {
           <ThemeSwitcher />
         </div>
         <button onClick={onRelease}>
-          <img src="/remove.svg" alt="remove" className="w-8 h-8" />
+          <img src="/remove.svg" alt="remove" className="w-10 lg:w-8 h-auto" />
         </button>
       </header>
-      <section className="w-full lg:w-1/2 p-4 pt-20">
+      <section className="w-full lg:w-1/2 p-4 py-20">
         {isLoadingPokemon ? (
           <SkeletonPokemonDetail />
         ) : (
           <div className="flex justify-center items-center">
             <div className="flex w-full lg:w-fit justify-center items-center mt-4 border-4 rounded-2xl border-yellow-500 space-x-4 p-4 mx-4">
               <div className="flex justify-center items-center">
-                <div className="w-36 h-36 lg:w-40 lg:h-40">
+                <div className="w-28 h-28 lg:w-40 lg:h-40">
                   <img
                     alt={`${pokemon?.name}`}
                     className="w-full h-auto"

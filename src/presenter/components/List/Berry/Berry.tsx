@@ -21,7 +21,7 @@ const ListBerry: React.FC<BerryProps> = ({
 
   if (berries?.length > 0) {
     return (
-      <div className="flex w-full lg:w-3/4 overflow-x-scroll p-4 rounded-3xl border border-gray-900 dark:border-white">
+      <div className="flex w-full lg:w-3/4 overflow-x-scroll p-4 rounded-3xl border border-gray-400 bg-gray-200">
         {berries.map((berry) => (
           <button
             className={`flex-none rounded-2xl mx-2 ${
