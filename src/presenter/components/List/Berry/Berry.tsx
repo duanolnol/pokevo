@@ -7,6 +7,7 @@ interface BerryProps {
   setSelected: (berry: BerryItemResult) => void;
   isLoading: boolean;
   selected: BerryItemResult | null;
+  isDisabled: boolean;
 }
 
 const ListBerry: React.FC<BerryProps> = ({
@@ -14,6 +15,7 @@ const ListBerry: React.FC<BerryProps> = ({
   setSelected,
   isLoading,
   selected,
+  isDisabled
 }) => {
   if (isLoading) {
     return <SkeletonBerry />;
@@ -24,7 +26,8 @@ const ListBerry: React.FC<BerryProps> = ({
       <div className="flex w-full lg:w-3/4 overflow-x-scroll p-4 rounded-3xl border border-gray-400 bg-gray-200">
         {berries.map((berry) => (
           <button
-            className={`flex-none rounded-2xl mx-2 ${
+            disabled={isDisabled}
+            className={`flex-none disabled:cursor-not-allowed rounded-2xl mx-2 ${
               selected?.id === berry.id ? "bg-yellow-300" : ""
             }`}
             key={berry.id}

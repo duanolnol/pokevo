@@ -8,10 +8,10 @@ import { usePokemonDetail } from "@/hooks/usePokemon";
 import Button from "@/presenter/components/Button";
 import { useBerry } from "@/hooks/useBerry";
 import { firmness } from "@/constants/berryWeight";
-import { BerryItemResult } from "@/interfaces/berry";
+import { BerryItemResult, Firmness } from "@/interfaces/berry";
 import ListBerry from "@/presenter/components/List/Berry";
 import SkeletonPokemonDetail from "@/presenter/components/Skeleton/PokemonDetail";
-
+import toast, { Toaster } from "react-hot-toast";
 const Pokemon: React.FC = () => {
   const navigate = useNavigate();
   const currentData: ItemResult | null = ls.get("POKEMON_STORE", {
@@ -36,12 +36,11 @@ const Pokemon: React.FC = () => {
   const { data: berryList, isLoading: isLoadingBerry } = useBerry(100);
   const berries: BerryItemResult[] = berryList?.results;
   const [selected, setSelected] = React.useState<BerryItemResult | null>(null);
-
+  const [isEvolution, setIsEvolution] = React.useState(false);
   const onRelease = () => {
     ls.remove("POKEMON_STORE");
     navigate("/");
   };
-
   const handleEvolution = () => {
     ls.set("POKEMON_STORE", nextEvolutions && nextEvolutions[0], {
       encrypt: true,
@@ -50,6 +49,7 @@ const Pokemon: React.FC = () => {
     setWeight([stats.Weight]);
     setFeed([]);
     setSelected(null);
+    setIsEvolution(false);
   };
 
   React.useEffect(() => {
@@ -63,6 +63,17 @@ const Pokemon: React.FC = () => {
       setNextEvolutions(pokemonDetail.nextEvolution);
     }
   }, [pokemonDetail]);
+
+  React.useEffect(() => {
+    if (
+      nextEvolutions &&
+      nextEvolutions.length > 0 &&
+      nextEvolutions[0].stats &&
+      nextEvolutions[0].stats.weight - stats.Weight <= 0
+    ) {
+      setIsEvolution(true);
+    }
+  }, [nextEvolutions, stats.Weight]);
 
   React.useEffect(() => {
     if (pokemonDetail) {
@@ -80,31 +91,87 @@ const Pokemon: React.FC = () => {
   const feedPokemon = () => {
     const lastBerry = feed[feed.length - 1];
     if (selected) {
+      const isSubtract = lastBerry?.firmness === selected.firmness;
       let newWeight = 0;
-      if (lastBerry?.firmness === selected.firmness) {
+      if (isSubtract) {
         const updateWeight = stats.Weight - firmness[selected.firmness] * 2;
         newWeight = updateWeight < 0 ? 1 : updateWeight;
+        notify(
+          firmness[selected.firmness] * 2,
+          selected.firmness,
+          isSubtract,
+          newWeight
+        );
       } else {
         newWeight = stats.Weight + firmness[selected.firmness];
+        notify(
+          firmness[selected.firmness],
+          selected.firmness,
+          isSubtract,
+          newWeight
+        );
       }
-      setFeed([
-        ...feed,
-        {
-          ...selected,
-          weight: firmness[selected.firmness],
-        },
-      ]);
-      setStats({
-        ...stats,
-        Weight: newWeight,
-      });
+      setFeed([...feed, { ...selected, weight: firmness[selected.firmness] }]);
+      setStats({ ...stats, Weight: newWeight });
       setWeight([...weight, newWeight]);
     }
   };
 
+  const notify = (
+    firmnessWeight: number,
+    firmness: Firmness,
+    isSubtract: boolean,
+    newWeight: number
+  ) => {
+    const isEvolution =
+      nextEvolutions &&
+      nextEvolutions.length > 0 &&
+      nextEvolutions[0].stats &&
+      newWeight >= nextEvolutions[0].stats.weight;
+    toast.custom(
+      (t) => (
+        <div
+          className={`${
+            t.visible ? "animate-enter" : "animate-leave"
+          } w-full max-w-md flex justify-center items-center bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4`}
+        >
+          {isEvolution ? (
+            <div className="flex flex-col justify-center items-center">
+              <p className="text-lg font-medium text-gray-900 capitalize">
+                Congratulations, your Pokemon ready to evolution !
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col justify-center items-center">
+              <div className="flex justify-center items-center space-x-1">
+                <p className="text-lg font-medium text-gray-900">
+                  {isSubtract
+                    ? "You choose same firmness berry"
+                    : "Your choose firmness berry is"}
+                </p>
+                <p className="text-xl text-orange-500 capitalize">
+                  {firmness.replace("-", " ")}
+                </p>
+              </div>
+              <p
+                className={`text-3xl font-bold ${
+                  isSubtract ? "text-red-600" : "text-green-600"
+                }`}
+              >
+                {isSubtract ? `- ${firmnessWeight}` : `+ ${firmnessWeight}`}
+              </p>
+            </div>
+          )}
+        </div>
+      ),
+      { duration: 5000 }
+    );
+  };
+  
   return (
     <Layout>
-      <header className="absolute z-50 w-full flex justify-center items-center px-3 lg:px-8">
+      <Toaster position="top-center" />
+      <header className="w-full flex justify-center items-center px-3 lg:px-8">
         <img className="w-20 lg:w-32 h-auto" src="/logo.png" alt="Logo" />
         <div className="flex w-full justify-center items-center space-x-6 p-4 bg-transparent">
           <div className="text-black dark:text-white font-bold text-2xl lg:text-3xl capitalize">
@@ -116,12 +183,12 @@ const Pokemon: React.FC = () => {
           <img src="/remove.svg" alt="remove" className="w-10 lg:w-8 h-auto" />
         </button>
       </header>
-      <section className="w-full lg:w-1/2 p-4 py-20">
+      <section className="w-full lg:w-1/2 p-4 pb-20 lg:py-20">
         {isLoadingPokemon ? (
           <SkeletonPokemonDetail />
         ) : (
           <div className="flex justify-center items-center">
-            <div className="flex w-full lg:w-fit justify-center items-center mt-4 border-4 rounded-2xl border-yellow-500 space-x-4 p-4 mx-4">
+            <div className="flex w-full lg:w-fit justify-center items-center mt-4 border-4 rounded-2xl border-yellow-500 space-x-2 lg:space-x-4 p-4 mx-4">
               <div className="flex justify-center items-center">
                 <div className="w-28 h-28 lg:w-40 lg:h-40">
                   <img
@@ -142,10 +209,10 @@ const Pokemon: React.FC = () => {
                       {key}
                     </div>
                     <div
-                      className={`text-xl font-bold ${
+                      className={`font-bold ${
                         key === "Weight"
                           ? "text-orange-500 text-3xl"
-                          : "text-yellow-500"
+                          : "text-yellow-500 text-xl"
                       }`}
                     >
                       {value}
@@ -156,40 +223,35 @@ const Pokemon: React.FC = () => {
             </div>
           </div>
         )}
-        {!isLoadingPokemon &&
-        nextEvolutions &&
-        nextEvolutions.length > 0 &&
-        nextEvolutions[0].stats &&
-        nextEvolutions[0].stats.weight - stats.Weight > 0 ? (
+        {!isLoadingPokemon && !isEvolution ? (
           <div className="flex flex-col justify-center items-center">
             <div className="mt-2">
               <div className="flex justify-center items-center space-x-2">
                 <p className="text-gray-500 text-lg">Next Evolution</p>
                 <p className="text-3xl font-bold text-yellow-500 capitalize">
-                  {nextEvolutions[0]?.name}
+                  {nextEvolutions && nextEvolutions[0]?.name}
                 </p>
               </div>
               <div className="flex justify-center items-center space-x-2">
                 <p className="text-gray-500 text-lg">Weight</p>
                 <p className="text-3xl font-bold text-orange-500">
-                  {nextEvolutions[0]?.stats.weight}
+                  {nextEvolutions &&
+                    nextEvolutions[0]?.stats &&
+                    nextEvolutions[0]?.stats.weight}
                 </p>
               </div>
             </div>
           </div>
-        ) : nextEvolutions &&
-          nextEvolutions.length > 0 &&
-          nextEvolutions[0].stats &&
-          nextEvolutions[0].stats.weight - stats.Weight <= 0 ? (
+        ) : (
           <div className="flex mt-2 flex-col justify-center items-center">
             <button
-              className="px-3 py-2 rounded-full bg-orange-500 text-white mt-2 font-bold w-1/3"
+              className="px-3 py-2 rounded-full bg-orange-500 text-white mt-2 font-bold w-1/3 shadow-[rgba(0,0,5,0.5)_2px_2px_4px_0px]"
               onClick={handleEvolution}
             >
               Evolution
             </button>
           </div>
-        ) : null}
+        )}
         <div className="flex flex-col justify-center items-center mt-5 px-4 ">
           <div className="flex w-fit justify-center items-center text-center gap-4 mb-4 border-4 rounded-2xl border-yellow-500 p-4">
             <div>
@@ -223,6 +285,7 @@ const Pokemon: React.FC = () => {
             berries={berries}
             isLoading={isLoadingBerry}
             selected={selected}
+            isDisabled={nextEvolutions?.length === 0 || isEvolution}
             setSelected={(item) => setSelected(item)}
           />
         </div>
@@ -239,12 +302,13 @@ const Pokemon: React.FC = () => {
             }
             ariaLabel="Feed Pokemon"
             handleClick={feedPokemon}
-            isDisabled={!selected || nextEvolutions?.length === 0}
+            isDisabled={
+              !selected || nextEvolutions?.length === 0 || isEvolution
+            }
           />
         </div>
       </footer>
     </Layout>
   );
 };
-
 export default Pokemon;
