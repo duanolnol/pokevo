@@ -12,6 +12,7 @@ import { BerryItemResult, Firmness } from "@/interfaces/berry";
 import ListBerry from "@/presenter/components/List/Berry";
 import SkeletonPokemonDetail from "@/presenter/components/Skeleton/PokemonDetail";
 import toast, { Toaster } from "react-hot-toast";
+import Modal from "@/presenter/components/Modal";
 const Pokemon: React.FC = () => {
   const navigate = useNavigate();
   const currentData: ItemResult | null = ls.get("POKEMON_STORE", {
@@ -37,6 +38,7 @@ const Pokemon: React.FC = () => {
   const berries: BerryItemResult[] = berryList?.results;
   const [selected, setSelected] = React.useState<BerryItemResult | null>(null);
   const [isEvolution, setIsEvolution] = React.useState(false);
+  const [modal, setModal] = React.useState(false);
   const onRelease = () => {
     ls.remove("POKEMON_STORE");
     navigate("/");
@@ -50,6 +52,7 @@ const Pokemon: React.FC = () => {
     setFeed([]);
     setSelected(null);
     setIsEvolution(false);
+    setModal(false);
   };
 
   React.useEffect(() => {
@@ -72,6 +75,7 @@ const Pokemon: React.FC = () => {
       nextEvolutions[0].stats.weight - stats.Weight <= 0
     ) {
       setIsEvolution(true);
+      setModal(true);
     }
   }, [nextEvolutions, stats.Weight]);
 
@@ -133,7 +137,7 @@ const Pokemon: React.FC = () => {
         <div
           className={`${
             t.visible ? "animate-enter" : "animate-leave"
-          } w-full max-w-md flex justify-center items-center bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4`}
+          } w-full max-w-md flex justify-center items-center bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 p-4`}
         >
           {isEvolution ? (
             <div className="flex flex-col justify-center items-center">
@@ -145,11 +149,13 @@ const Pokemon: React.FC = () => {
             <div className="flex flex-col justify-center items-center">
               <div className="flex justify-center items-center space-x-1">
                 <p className="text-lg font-medium text-gray-900">
-                  {isSubtract
-                    ? "You choose same firmness berry"
-                    : "Your choose firmness berry is"}
+                  Your firmness berry is
                 </p>
-                <p className="text-xl text-orange-500 capitalize">
+                <p
+                  className={`text-xl font-bold ${
+                    isSubtract ? "text-red-500" : "text-green-500"
+                  } capitalize`}
+                >
                   {firmness.replace("-", " ")}
                 </p>
               </div>
@@ -164,12 +170,34 @@ const Pokemon: React.FC = () => {
           )}
         </div>
       ),
-      { duration: 5000 }
+      { duration: 2000 }
     );
   };
-  
+
   return (
     <Layout>
+      {modal ? (
+        <Modal>
+          <div className="flex flex-col items-center p-6 bg-slate-200 border-0 rounded-3xl">
+            <div className="text-xl font-bold text-gray-900">
+              This is your next Pokemon Evolution
+            </div>
+            <div className="text-3xl font-bold text-yellow-500 capitalize">
+              {nextEvolutions && nextEvolutions[0]?.name}
+            </div>
+            <img
+              className="w-20 lg:w-40 h-auto my-4"
+              src={`${nextEvolutions && nextEvolutions[0]?.imageUrl.large}`}
+              alt="Logo"
+            />
+            <Button
+              title="Evolution"
+              ariaLabel="Evolution"
+              handleClick={handleEvolution}
+            />
+          </div>
+        </Modal>
+      ) : null}
       <Toaster position="top-center" />
       <header className="w-full flex justify-center items-center px-3 lg:px-8">
         <img className="w-20 lg:w-32 h-auto" src="/logo.png" alt="Logo" />
@@ -223,7 +251,10 @@ const Pokemon: React.FC = () => {
             </div>
           </div>
         )}
-        {!isLoadingPokemon && !isEvolution ? (
+        {!isLoadingPokemon &&
+        !isEvolution &&
+        nextEvolutions &&
+        nextEvolutions?.length > 0 ? (
           <div className="flex flex-col justify-center items-center">
             <div className="mt-2">
               <div className="flex justify-center items-center space-x-2">
@@ -242,16 +273,7 @@ const Pokemon: React.FC = () => {
               </div>
             </div>
           </div>
-        ) : (
-          <div className="flex mt-2 flex-col justify-center items-center">
-            <button
-              className="px-3 py-2 rounded-full bg-orange-500 text-white mt-2 font-bold w-1/3 shadow-[rgba(0,0,5,0.5)_2px_2px_4px_0px]"
-              onClick={handleEvolution}
-            >
-              Evolution
-            </button>
-          </div>
-        )}
+        ) : null}
         <div className="flex flex-col justify-center items-center mt-5 px-4 ">
           <div className="flex w-fit justify-center items-center text-center gap-4 mb-4 border-4 rounded-2xl border-yellow-500 p-4">
             <div>
@@ -291,7 +313,7 @@ const Pokemon: React.FC = () => {
         </div>
       </section>
       <footer className="flex justify-center items-center">
-        <div className="w-full lg:w-1/3 fixed border-0 rounded-t-xl lg:rounded-t-full bottom-0 h-20 flex justify-center items-center">
+        <div className="w-full lg:w-1/3 fixed bottom-0 h-20 flex justify-center items-center">
           <Button
             title={
               selected

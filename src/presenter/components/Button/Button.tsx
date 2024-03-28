@@ -4,7 +4,7 @@ interface ButtonProps {
   title: string;
   ariaLabel: string;
   handleClick: () => void;
-  isDisabled: boolean;
+  isDisabled?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
