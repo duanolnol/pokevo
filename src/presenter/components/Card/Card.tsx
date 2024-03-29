@@ -8,13 +8,13 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ data, onSelect, isSelected }) => (
-  <button onClick={() => onSelect(data)} className="flex flex-col items-center">
+  <button onClick={() => onSelect(data)} className="flex flex-col items-center transition-transform duration-200 ease-in-out hover:-translate-y-2 animate-bounc">
     <div
       className={`border ${
         isSelected
-          ? "border-yellow-500 border-4"
+          ? "border-yellow-500 border-4 lg:border-8"
           : "bg-gradient-to-r from-yellow-100 to-yellow-200"
-      } rounded-full p-0.5 mb-2`}
+      } rounded-full p-0.5 lg:p-2 mb-2`}
     >
       <div className="bg-slate-200 dark:bg-gray-900 rounded-full p-4 lg:p-8">
         <img

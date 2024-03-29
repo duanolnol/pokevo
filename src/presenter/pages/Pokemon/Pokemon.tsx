@@ -171,13 +171,22 @@ const Pokemon: React.FC = () => {
                   {firmness.replace("-", " ")}
                 </p>
               </div>
-              <p
-                className={`text-3xl font-bold ${
-                  isSubtract ? "text-red-600" : "text-green-600"
-                }`}
-              >
-                {isSubtract ? `- ${firmnessWeight}` : `+ ${firmnessWeight}`}
-              </p>
+              <div className="flex justify-center items-center space-x-2">
+                <p
+                  className={`text-3xl font-bold ${
+                    isSubtract ? "text-red-600" : "text-green-600"
+                  }`}
+                >
+                  {isSubtract ? `- ${firmnessWeight}` : `+ ${firmnessWeight}`}
+                </p>
+                <p
+                  className={`text-lg font-medium ${
+                    isSubtract ? "text-red-600" : "text-green-500"
+                  }`}
+                >
+                  Weight
+                </p>
+              </div>
             </div>
           )}
         </div>
@@ -190,7 +199,7 @@ const Pokemon: React.FC = () => {
     <Layout>
       {modal ? (
         <Modal>
-          <div className="flex flex-col items-center p-6 bg-slate-200 border-0 rounded-3xl">
+          <div className="flex flex-col items-center p-6 mx-4 bg-slate-200 border-0 rounded-3xl">
             <div className="text-xl font-bold text-gray-900">
               This is your next Pokemon Evolution
             </div>
@@ -214,7 +223,7 @@ const Pokemon: React.FC = () => {
       <header className="w-full flex justify-center items-center px-3 lg:px-8">
         <img className="w-20 lg:w-32 h-auto" src="/logo.png" alt="Logo" />
         <div className="flex w-full justify-center items-center space-x-6 p-4 bg-transparent">
-          <div className="text-black dark:text-orange-500 font-bold text-2xl lg:text-3xl capitalize">
+          <div className="text-gray-900 dark:text-green-700 font-bold text-2xl lg:text-3xl capitalize">
             {pokemon?.name}
           </div>
           <ThemeSwitcher />
@@ -228,9 +237,9 @@ const Pokemon: React.FC = () => {
           <SkeletonPokemonDetail />
         ) : (
           <div className="flex justify-center items-center">
-            <div className="flex w-full lg:w-fit justify-center items-center mt-4 border-4 rounded-2xl border-yellow-500 space-x-8 p-4 mx-4">
+            <div className="flex w-full lg:w-fit justify-center items-center mt-4 border-8 rounded-3xl border-yellow-500 space-x-6 p-4 mx-4">
               <div className="flex justify-center items-center">
-                <div className="w-28 h-auto">
+                <div className="w-24 h-auto">
                   <img
                     alt={`${pokemon?.name}`}
                     className="w-full h-auto"
@@ -267,25 +276,26 @@ const Pokemon: React.FC = () => {
         !isEvolution &&
         nextEvolutions &&
         nextEvolutions?.length > 0 ? (
-          <div className="flex flex-col justify-center items-center">
-            <div className="mt-4">
-              <div className="flex justify-center items-center mb-2">
-                <ProgressBar percent={percent} />
-              </div>
+          <div className="flex flex-col justify-center items-center mt-4">
+            <div className="flex justify-center items-center space-x-2">
+              <p className="text-gray-500 text-lg">Next Evolution</p>
+              <p className="text-3xl font-bold text-yellow-500 capitalize">
+                {nextEvolutions && nextEvolutions[0]?.name}
+              </p>
+            </div>
+            <div className="flex justify-center items-center mb-2 space-x-2">
               <div className="flex justify-center items-center space-x-2">
-                <p className="text-gray-500 text-lg">Next Evolution</p>
-                <p className="text-3xl font-bold text-yellow-500 capitalize">
-                  {nextEvolutions && nextEvolutions[0]?.name}
-                </p>
-              </div>
-              <div className="flex justify-center items-center space-x-2">
-                <p className="text-gray-500 text-lg">Weight</p>
+                <p className="text-gray-500 text-lg">Target Weight</p>
                 <p className="text-3xl font-bold text-orange-500">
                   {nextEvolutions &&
                     nextEvolutions[0]?.stats &&
                     nextEvolutions[0]?.stats.weight}
                 </p>
               </div>
+            </div>
+            <div className="flex justify-center items-center mb-2 space-x-2">
+              <ProgressBar percent={percent} />
+              <span className="text-gray-900 dark:text-gray-100 font-bold text-lg">{`${percent}%`}</span>
             </div>
           </div>
         ) : null}

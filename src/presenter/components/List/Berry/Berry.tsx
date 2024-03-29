@@ -35,7 +35,7 @@ const ListBerry: React.FC<BerryProps> = ({
           >
             <img
               alt={berry.name}
-              className="w-full h-auto"
+              className="w-10 h-auto"
               src={berry.imageUrl}
             />
           </button>
