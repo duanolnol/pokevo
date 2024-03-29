@@ -223,7 +223,7 @@ const Pokemon: React.FC = () => {
       <header className="w-full flex justify-center items-center px-3 lg:px-8">
         <img className="w-20 lg:w-32 h-auto" src="/logo.png" alt="Logo" />
         <div className="flex w-full justify-center items-center space-x-6 p-4 bg-transparent">
-          <div className="text-gray-900 dark:text-green-700 font-bold text-2xl lg:text-3xl capitalize">
+          <div className="text-gray-900 dark:text-yellow-500 font-bold text-3xl capitalize">
             {pokemon?.name}
           </div>
           <ThemeSwitcher />
