@@ -13,6 +13,7 @@ import ListBerry from "@/presenter/components/List/Berry";
 import SkeletonPokemonDetail from "@/presenter/components/Skeleton/PokemonDetail";
 import toast, { Toaster } from "react-hot-toast";
 import Modal from "@/presenter/components/Modal";
+import ProgressBar from "@/presenter/components/ProgressBar";
 const Pokemon: React.FC = () => {
   const navigate = useNavigate();
   const currentData: ItemResult | null = ls.get("POKEMON_STORE", {
@@ -34,15 +35,18 @@ const Pokemon: React.FC = () => {
   });
   const [feed, setFeed] = React.useState<BerryItemResult[]>([]);
   const [weight, setWeight] = React.useState<number[]>([]);
+  const [percent, setPercent] = React.useState<number>(0);
   const { data: berryList, isLoading: isLoadingBerry } = useBerry(100);
   const berries: BerryItemResult[] = berryList?.results;
   const [selected, setSelected] = React.useState<BerryItemResult | null>(null);
   const [isEvolution, setIsEvolution] = React.useState(false);
   const [modal, setModal] = React.useState(false);
+
   const onRelease = () => {
     ls.remove("POKEMON_STORE");
     navigate("/");
   };
+
   const handleEvolution = () => {
     ls.set("POKEMON_STORE", nextEvolutions && nextEvolutions[0], {
       encrypt: true,
@@ -54,43 +58,6 @@ const Pokemon: React.FC = () => {
     setIsEvolution(false);
     setModal(false);
   };
-
-  React.useEffect(() => {
-    if (!pokemon) {
-      navigate("/");
-    }
-  }, [navigate, pokemon]);
-
-  React.useEffect(() => {
-    if (pokemonDetail && pokemonDetail.nextEvolution) {
-      setNextEvolutions(pokemonDetail.nextEvolution);
-    }
-  }, [pokemonDetail]);
-
-  React.useEffect(() => {
-    if (
-      nextEvolutions &&
-      nextEvolutions.length > 0 &&
-      nextEvolutions[0].stats &&
-      nextEvolutions[0].stats.weight - stats.Weight <= 0
-    ) {
-      setIsEvolution(true);
-      setModal(true);
-    }
-  }, [nextEvolutions, stats.Weight]);
-
-  React.useEffect(() => {
-    if (pokemonDetail) {
-      setStats({
-        HP: pokemonDetail?.stats.hp,
-        Attack: pokemonDetail?.stats.attack,
-        Defense: pokemonDetail?.stats.defense,
-        Speed: pokemonDetail?.stats.speed,
-        Weight: pokemonDetail?.stats.weight,
-      });
-      setWeight([pokemonDetail?.stats.weight]);
-    }
-  }, [pokemonDetail]);
 
   const feedPokemon = () => {
     const lastBerry = feed[feed.length - 1];
@@ -120,6 +87,51 @@ const Pokemon: React.FC = () => {
       setWeight([...weight, newWeight]);
     }
   };
+
+  React.useEffect(() => {
+    if (!pokemon) {
+      navigate("/");
+    }
+  }, [navigate, pokemon]);
+
+  React.useEffect(() => {
+    if (
+      pokemonDetail &&
+      pokemonDetail.nextEvolution &&
+      pokemonDetail.nextEvolution[0]?.stats
+    ) {
+      const nextWeight = pokemonDetail.nextEvolution[0]?.stats?.weight;
+      const percent = (stats.Weight / nextWeight) * 100;
+      setNextEvolutions(pokemonDetail.nextEvolution);
+      setPercent(+percent.toFixed());
+    }
+  }, [pokemonDetail, stats.Weight]);
+
+  React.useEffect(() => {
+    if (
+      pokemonDetail &&
+      pokemonDetail.nextEvolution &&
+      pokemonDetail.nextEvolution[0]?.stats
+    ) {
+      if (pokemonDetail.nextEvolution[0]?.stats?.weight - stats.Weight <= 0) {
+        setIsEvolution(true);
+        setModal(true);
+      }
+    }
+  }, [pokemonDetail, stats.Weight]);
+
+  React.useEffect(() => {
+    if (pokemonDetail) {
+      setStats({
+        HP: pokemonDetail?.stats.hp,
+        Attack: pokemonDetail?.stats.attack,
+        Defense: pokemonDetail?.stats.defense,
+        Speed: pokemonDetail?.stats.speed,
+        Weight: pokemonDetail?.stats.weight,
+      });
+      setWeight([pokemonDetail?.stats.weight]);
+    }
+  }, [pokemonDetail]);
 
   const notify = (
     firmnessWeight: number,
@@ -186,8 +198,8 @@ const Pokemon: React.FC = () => {
               {nextEvolutions && nextEvolutions[0]?.name}
             </div>
             <img
-              className="w-20 lg:w-40 h-auto my-4"
-              src={`${nextEvolutions && nextEvolutions[0]?.imageUrl.large}`}
+              className="w-40 h-auto my-4"
+              src={`${nextEvolutions && nextEvolutions[0]?.imageUrl.gif}`}
               alt="Logo"
             />
             <Button
@@ -202,7 +214,7 @@ const Pokemon: React.FC = () => {
       <header className="w-full flex justify-center items-center px-3 lg:px-8">
         <img className="w-20 lg:w-32 h-auto" src="/logo.png" alt="Logo" />
         <div className="flex w-full justify-center items-center space-x-6 p-4 bg-transparent">
-          <div className="text-black dark:text-white font-bold text-2xl lg:text-3xl capitalize">
+          <div className="text-black dark:text-orange-500 font-bold text-2xl lg:text-3xl capitalize">
             {pokemon?.name}
           </div>
           <ThemeSwitcher />
@@ -211,18 +223,18 @@ const Pokemon: React.FC = () => {
           <img src="/remove.svg" alt="remove" className="w-10 lg:w-8 h-auto" />
         </button>
       </header>
-      <section className="w-full lg:w-1/2 p-4 pb-20 lg:py-20">
+      <section className="w-full lg:w-1/2 p-4 pb-20 lg:pb-20">
         {isLoadingPokemon ? (
           <SkeletonPokemonDetail />
         ) : (
           <div className="flex justify-center items-center">
-            <div className="flex w-full lg:w-fit justify-center items-center mt-4 border-4 rounded-2xl border-yellow-500 space-x-2 lg:space-x-4 p-4 mx-4">
+            <div className="flex w-full lg:w-fit justify-center items-center mt-4 border-4 rounded-2xl border-yellow-500 space-x-8 p-4 mx-4">
               <div className="flex justify-center items-center">
-                <div className="w-28 h-28 lg:w-40 lg:h-40">
+                <div className="w-28 h-auto">
                   <img
                     alt={`${pokemon?.name}`}
                     className="w-full h-auto"
-                    src={pokemon?.imageUrl.large}
+                    src={pokemonDetail?.imageUrl.gif}
                   />
                 </div>
               </div>
@@ -256,7 +268,10 @@ const Pokemon: React.FC = () => {
         nextEvolutions &&
         nextEvolutions?.length > 0 ? (
           <div className="flex flex-col justify-center items-center">
-            <div className="mt-2">
+            <div className="mt-4">
+              <div className="flex justify-center items-center mb-2">
+                <ProgressBar percent={percent} />
+              </div>
               <div className="flex justify-center items-center space-x-2">
                 <p className="text-gray-500 text-lg">Next Evolution</p>
                 <p className="text-3xl font-bold text-yellow-500 capitalize">

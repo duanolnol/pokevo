@@ -5,6 +5,7 @@ const getNewEvolution = (evolution: any): FormatData | null => {
   if (!evolution) {
     return null;
   }
+
   const id = evolution.species.url.split("/")[6];
   return {
     name: evolution.species.name,
@@ -13,6 +14,7 @@ const getNewEvolution = (evolution: any): FormatData | null => {
     imageUrl: {
       small: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
       large: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
+      gif: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/${id}.gif`,
     },
     stats: {
       hp: 0,
@@ -75,6 +77,12 @@ export const getPokemonDetail = async (id: string) => {
   const pokemonDetail = {
     id: detailData.id,
     name: detailData.name,
+    imageUrl: {
+      small: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${detailData.id}.png`,
+      large: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${detailData.id}.png`,
+      gif: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/${detailData.id}.gif`,
+    },
+
     stats: {
       hp: detailData.stats[0].base_stat,
       attack: detailData.stats[1].base_stat,

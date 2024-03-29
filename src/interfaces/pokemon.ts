@@ -96,6 +96,7 @@ export interface FormatData {
   imageUrl: {
     small: string;
     large: string;
+    gif?: string;
   };
   stats?: Stats;
 }
