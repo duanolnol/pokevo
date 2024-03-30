@@ -102,20 +102,12 @@ export interface FormatData {
 }
 
 export interface ItemResult extends FormatData {}
-export interface NextEvolution extends FormatData {}
 
 export interface ListData {
   count: number;
   next: string;
   previous: string;
   results: ItemResult[];
-}
-export interface DetailData {
-  id: string;
-  name: string;
-  stats: Stats;
-  nextEvolution: NextEvolution;
-  nextEvolutions: NextEvolution[];
 }
 
 interface Species extends Name {}

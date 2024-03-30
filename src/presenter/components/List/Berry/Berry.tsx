@@ -23,7 +23,7 @@ const ListBerry: React.FC<BerryProps> = ({
 
   if (berries?.length > 0) {
     return (
-      <div className="flex w-full lg:w-3/4 overflow-x-scroll p-4 rounded-3xl border border-gray-400 bg-gray-200">
+      <div className="flex w-full lg:w-3/4 overflow-x-scroll p-2 rounded-3xl border border-gray-400 bg-gray-200">
         {berries.map((berry) => (
           <button
             disabled={isDisabled}
@@ -35,7 +35,7 @@ const ListBerry: React.FC<BerryProps> = ({
           >
             <img
               alt={berry.name}
-              className="w-10 h-auto"
+              className="w-12 h-auto"
               src={berry.imageUrl}
             />
           </button>

@@ -2,7 +2,7 @@ import ThemeSwitcher from "@/presenter/components/ThemeSwitcher";
 import React from "react";
 import ls from "localstorage-slim";
 import { useNavigate } from "react-router";
-import { ItemResult, NextEvolution, StatsPokemon } from "@/interfaces/pokemon";
+import { ItemResult, StatsPokemon } from "@/interfaces/pokemon";
 import Layout from "@/presenter/components/Layout";
 import { usePokemonDetail } from "@/hooks/usePokemon";
 import Button from "@/presenter/components/Button";
@@ -19,12 +19,8 @@ const Pokemon: React.FC = () => {
   const currentData: ItemResult | null = ls.get("POKEMON_STORE", {
     decrypt: true,
   });
-  const [nextEvolutions, setNextEvolutions] = React.useState<
-    NextEvolution[] | null
-  >([]);
-  const [pokemon, setPokemon] = React.useState<ItemResult | null>(currentData);
   const { data: pokemonDetail, isLoading: isLoadingPokemon } = usePokemonDetail(
-    pokemon?.id || ""
+    currentData?.id || ""
   );
   const [stats, setStats] = React.useState<StatsPokemon>({
     HP: 0,
@@ -41,17 +37,19 @@ const Pokemon: React.FC = () => {
   const [selected, setSelected] = React.useState<BerryItemResult | null>(null);
   const [isEvolution, setIsEvolution] = React.useState(false);
   const [modal, setModal] = React.useState(false);
-
   const onRelease = () => {
     ls.remove("POKEMON_STORE");
     navigate("/");
   };
 
   const handleEvolution = () => {
-    ls.set("POKEMON_STORE", nextEvolutions && nextEvolutions[0], {
-      encrypt: true,
-    });
-    setPokemon(nextEvolutions && nextEvolutions[0]);
+    ls.set(
+      "POKEMON_STORE",
+      pokemonDetail?.nextEvolution && pokemonDetail?.nextEvolution[0],
+      {
+        encrypt: true,
+      }
+    );
     setWeight([stats.Weight]);
     setFeed([]);
     setSelected(null);
@@ -67,20 +65,10 @@ const Pokemon: React.FC = () => {
       if (isSubtract) {
         const updateWeight = stats.Weight - firmness[selected.firmness] * 2;
         newWeight = updateWeight < 0 ? 1 : updateWeight;
-        notify(
-          firmness[selected.firmness] * 2,
-          selected.firmness,
-          isSubtract,
-          newWeight
-        );
+        notify(firmness[selected.firmness] * 2, selected.firmness, isSubtract);
       } else {
         newWeight = stats.Weight + firmness[selected.firmness];
-        notify(
-          firmness[selected.firmness],
-          selected.firmness,
-          isSubtract,
-          newWeight
-        );
+        notify(firmness[selected.firmness], selected.firmness, isSubtract);
       }
       setFeed([...feed, { ...selected, weight: firmness[selected.firmness] }]);
       setStats({ ...stats, Weight: newWeight });
@@ -89,23 +77,10 @@ const Pokemon: React.FC = () => {
   };
 
   React.useEffect(() => {
-    if (!pokemon) {
+    if (!currentData) {
       navigate("/");
     }
-  }, [navigate, pokemon]);
-
-  React.useEffect(() => {
-    if (
-      pokemonDetail &&
-      pokemonDetail.nextEvolution &&
-      pokemonDetail.nextEvolution[0]?.stats
-    ) {
-      const nextWeight = pokemonDetail.nextEvolution[0]?.stats?.weight;
-      const percent = (stats.Weight / nextWeight) * 100;
-      setNextEvolutions(pokemonDetail.nextEvolution);
-      setPercent(+percent.toFixed());
-    }
-  }, [pokemonDetail, stats.Weight]);
+  }, [navigate, currentData]);
 
   React.useEffect(() => {
     if (
@@ -117,6 +92,10 @@ const Pokemon: React.FC = () => {
         setIsEvolution(true);
         setModal(true);
       }
+
+      const nextWeight = pokemonDetail.nextEvolution[0]?.stats?.weight;
+      const percent = (stats.Weight / nextWeight) * 100;
+      setPercent(+percent.toFixed());
     }
   }, [pokemonDetail, stats.Weight]);
 
@@ -136,14 +115,8 @@ const Pokemon: React.FC = () => {
   const notify = (
     firmnessWeight: number,
     firmness: Firmness,
-    isSubtract: boolean,
-    newWeight: number
+    isSubtract: boolean
   ) => {
-    const isEvolution =
-      nextEvolutions &&
-      nextEvolutions.length > 0 &&
-      nextEvolutions[0].stats &&
-      newWeight >= nextEvolutions[0].stats.weight;
     toast.custom(
       (t) => (
         <div
@@ -204,11 +177,15 @@ const Pokemon: React.FC = () => {
               This is your next Pokemon Evolution
             </div>
             <div className="text-3xl font-bold text-yellow-500 capitalize">
-              {nextEvolutions && nextEvolutions[0]?.name}
+              {pokemonDetail?.nextEvolution &&
+                pokemonDetail?.nextEvolution[0]?.name}
             </div>
             <img
               className="w-40 h-auto my-4"
-              src={`${nextEvolutions && nextEvolutions[0]?.imageUrl.gif}`}
+              src={`${
+                pokemonDetail?.nextEvolution &&
+                pokemonDetail?.nextEvolution[0]?.imageUrl.gif
+              }`}
               alt="Logo"
             />
             <Button
@@ -222,9 +199,9 @@ const Pokemon: React.FC = () => {
       <Toaster position="top-center" />
       <header className="w-full flex justify-center items-center px-3 lg:px-8">
         <img className="w-20 lg:w-32 h-auto" src="/logo.png" alt="Logo" />
-        <div className="flex w-full justify-center items-center space-x-6 p-4 bg-transparent">
-          <div className="text-gray-900 dark:text-yellow-500 font-bold text-3xl capitalize">
-            {pokemon?.name}
+        <div className="flex w-full justify-center items-center space-x-6 p-4 pb-0 bg-transparent">
+          <div className="text-gray-900 dark:text-yellow-500 font-bold text-2xl capitalize">
+            {pokemonDetail?.name}
           </div>
           <ThemeSwitcher />
         </div>
@@ -232,7 +209,7 @@ const Pokemon: React.FC = () => {
           <img src="/remove.svg" alt="remove" className="w-10 lg:w-8 h-auto" />
         </button>
       </header>
-      <section className="w-full lg:w-1/2 p-4 pb-20 lg:pb-20">
+      <section className="w-full lg:w-1/2 p-4 pt-0 lg:pt-4 pb-10 lg:pb-20">
         {isLoadingPokemon ? (
           <SkeletonPokemonDetail />
         ) : (
@@ -241,7 +218,7 @@ const Pokemon: React.FC = () => {
               <div className="flex justify-center items-center">
                 <div className="w-24 h-auto">
                   <img
-                    alt={`${pokemon?.name}`}
+                    alt={`${pokemonDetail?.name}`}
                     className="w-full h-auto"
                     src={pokemonDetail?.imageUrl.gif}
                   />
@@ -274,22 +251,23 @@ const Pokemon: React.FC = () => {
         )}
         {!isLoadingPokemon &&
         !isEvolution &&
-        nextEvolutions &&
-        nextEvolutions?.length > 0 ? (
+        pokemonDetail?.nextEvolution &&
+        pokemonDetail.nextEvolution?.length > 0 ? (
           <div className="flex flex-col justify-center items-center mt-4">
             <div className="flex justify-center items-center space-x-2">
               <p className="text-gray-500 text-lg">Next Evolution</p>
               <p className="text-3xl font-bold text-yellow-500 capitalize">
-                {nextEvolutions && nextEvolutions[0]?.name}
+                {pokemonDetail?.nextEvolution &&
+                  pokemonDetail?.nextEvolution[0]?.name}
               </p>
             </div>
             <div className="flex justify-center items-center mb-2 space-x-2">
               <div className="flex justify-center items-center space-x-2">
                 <p className="text-gray-500 text-lg">Target Weight</p>
                 <p className="text-3xl font-bold text-orange-500">
-                  {nextEvolutions &&
-                    nextEvolutions[0]?.stats &&
-                    nextEvolutions[0]?.stats.weight}
+                  {pokemonDetail?.nextEvolution &&
+                    pokemonDetail?.nextEvolution[0]?.stats &&
+                    pokemonDetail?.nextEvolution[0]?.stats.weight}
                 </p>
               </div>
             </div>
@@ -300,24 +278,24 @@ const Pokemon: React.FC = () => {
           </div>
         ) : null}
         <div className="flex flex-col justify-center items-center mt-5 px-4 ">
-          <div className="flex w-fit justify-center items-center text-center gap-4 mb-4 border-4 rounded-2xl border-yellow-500 p-4">
+          <div className="flex w-fit justify-center items-center text-center gap-4 mb-4 border-8 rounded-2xl border-yellow-500 p-4">
             <div>
               <p className="text-gray-500 text-sm">Berries</p>
-              <p className="text-lg font-bold capitalize dark:text-white text-gray-500">
+              <p className="text-xl font-semibold capitalize dark:text-white text-gray-500">
                 {selected?.name || "0"}
               </p>
             </div>
             <div>
               <p className="text-gray-500 text-sm">Firmness</p>
-              <p className="text-lg font-bold capitalize dark:text-white text-gray-500">
+              <p className="text-xl font-semibold capitalize dark:text-white text-gray-500">
                 {selected?.firmness.replace("-", " ") || "0"}
               </p>
             </div>
             <div>
               <p className="text-gray-500 text-sm">Weight</p>
               <p
-                className={`text-lg font-bold capitalize dark:text-white ${
-                  selected && "text-orange-500"
+                className={`text-xl font-bold capitalize dark:text-white ${
+                  selected && "text-green-500"
                 }`}
               >
                 {selected
@@ -332,7 +310,9 @@ const Pokemon: React.FC = () => {
             berries={berries}
             isLoading={isLoadingBerry}
             selected={selected}
-            isDisabled={nextEvolutions?.length === 0 || isEvolution}
+            isDisabled={
+              pokemonDetail?.nextEvolution?.length === 0 || isEvolution
+            }
             setSelected={(item) => setSelected(item)}
           />
         </div>
@@ -343,14 +323,16 @@ const Pokemon: React.FC = () => {
             title={
               selected
                 ? "Feed Pokemon"
-                : nextEvolutions?.length === 0
+                : pokemonDetail?.nextEvolution?.length === 0
                 ? "No more evolution ..."
                 : "Select Berry for feeding ..."
             }
             ariaLabel="Feed Pokemon"
             handleClick={feedPokemon}
             isDisabled={
-              !selected || nextEvolutions?.length === 0 || isEvolution
+              !selected ||
+              pokemonDetail?.nextEvolution?.length === 0 ||
+              isEvolution
             }
           />
         </div>
