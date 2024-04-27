@@ -101,7 +101,7 @@ const App = () => {
       </header>
       <section className="p-4 pt-24 lg:pt-32 pb-20">
         {errorAxios ? (
-          <div className="text-lg font-semibold">
+          <div className="text-lg font-semibold text-black dark:text-gray-200">
             {errorAxios.response?.status === 404
               ? "Sorry, we can't find pokemon you're looking for. Try to find another pokemon. example: pikachu"
               : "Server is error, you can try again later"}
