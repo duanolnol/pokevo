@@ -1,17 +1,18 @@
 import Search from "./presenter/components/Search";
 import List from "./presenter/components/List/Pokemon";
 import React from "react";
-import { useSearch } from "./hooks/useSearch";
 import { usePokemon } from "./hooks/usePokemon";
 import { ItemResult } from "./interfaces/pokemon";
 import ThemeSwitcher from "./presenter/components/ThemeSwitcher";
 import ls from "localstorage-slim";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import Layout from "./presenter/components/Layout";
 import Button from "./presenter/components/Button";
+import { AxiosError } from "axios";
+import Skeleton from "./presenter/components/Skeleton/Pokemon/Skeleton";
 
 const App = () => {
-  const { search, handleSearch, handleClear } = useSearch();
+  const [search, setSearch] = React.useState<string>("");
   const observer = React.useRef<IntersectionObserver | null>(null);
   const [offset, setOffset] = React.useState(0);
   const limit = 10;
@@ -19,7 +20,18 @@ const App = () => {
   const [selected, setSelected] = React.useState<ItemResult | null>(null);
   const navigate = useNavigate();
 
-  const { data, isLoading, isFetched } = usePokemon(search, limit, offset);
+  const { data, isLoading, isFetched, error } = usePokemon(
+    search,
+    limit,
+    offset
+  );
+
+  const errorAxios = error as AxiosError;
+
+  const skeletons = () =>
+    [...Array(10).keys()].map((_, index) => {
+      return <Skeleton key={`skeleton-${index}`} />;
+    });
 
   React.useEffect(() => {
     if (isFetched) {
@@ -46,12 +58,12 @@ const App = () => {
   };
   const loadMore = () => setOffset((prev) => prev + limit);
   const onHandleClear = () => {
-    handleClear();
+    setSearch("");
     setCurrentData([]);
     setOffset(0);
   };
   const onHandleSearch = (search: string) => {
-    handleSearch(search);
+    setSearch(search);
     setOffset(0);
   };
   const handleSelect = (pokemon: ItemResult) => {
@@ -83,22 +95,30 @@ const App = () => {
       <header className="absolute z-50 w-full flex justify-center items-center">
         <div className="flex w-full justify-center items-center space-x-4 lg:space-x-6 p-4 bg-transparent">
           <img className="w-20 lg:w-32 h-auto" src="/logo.png" alt="Logo" />
-          <Search
-            search={search}
-            handleSearch={onHandleSearch}
-            handleClear={onHandleClear}
-          />
+          <Search handleSearch={onHandleSearch} handleClear={onHandleClear} />
           <ThemeSwitcher />
         </div>
       </header>
       <section className="p-4 pt-24 lg:pt-32 pb-20">
-        <List
-          isLoading={isLoading}
-          lastElementRef={lastElementRef}
-          results={currentData}
-          handleSelect={handleSelect}
-          selected={selected}
-        />
+        {errorAxios ? (
+          <div className="text-lg font-semibold">
+            {errorAxios.response?.status === 404
+              ? "Sorry, we can't find pokemon you're looking for. Try to find another pokemon. example: pikachu"
+              : "Server is error, you can try again later"}
+          </div>
+        ) : null}
+        <div className="grid grid-cols-3 gap-4">
+          {isLoading ? (
+            skeletons()
+          ) : (
+            <List
+              lastElementRef={lastElementRef}
+              results={currentData}
+              handleSelect={handleSelect}
+              selected={selected}
+            />
+          )}
+        </div>
       </section>
       <footer className="flex justify-center items-center">
         <div className="w-full lg:w-1/3 fixed border-0 rounded-t-xl lg:rounded-t-full bottom-0 h-20 flex justify-center items-center">

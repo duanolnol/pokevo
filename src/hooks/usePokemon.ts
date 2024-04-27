@@ -3,7 +3,7 @@ import { getPokemonDetail } from './../model/api/pokemonDetail';
 import { getPokemon } from "../model/api/pokemon";
 
 export const usePokemon = (search: string, limit: number, offset: number) => {
-  const { data, isLoading, isFetched } = useQuery({
+  const { data, isLoading, isFetched, error } = useQuery({
     queryKey: ["pokemonList", search, limit, offset],
     queryFn: () => getPokemon(search, limit, offset),
   });
@@ -12,6 +12,7 @@ export const usePokemon = (search: string, limit: number, offset: number) => {
     data,
     isLoading,
     isFetched,
+    error
   };
 };
 
